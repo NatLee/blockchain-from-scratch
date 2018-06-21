@@ -7,6 +7,7 @@ Use the line below to run Django server.
 
 Upload image page.
 >> http://localhost:8000/uploadImg/
+
 Show image page.
 >> http://localhost:8000/showImg/
 

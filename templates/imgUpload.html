@@ -8,7 +8,16 @@
     <form action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="file" name="img">
+        Cer Owner Name:
+        <input type="text" name="cerOwner">
         <input type="submit" value="upload">
     </form>
+    <br>
+    <form action="/mineBlock/" method="post" target="_blank">
+        	{% csrf_token %}
+  	<button type="submit">mine block</button>
+	</form>
+    <br>
+    <a href="/searchImg/">Search Page</a>
 </body>
 </html>

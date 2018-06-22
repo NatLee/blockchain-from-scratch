@@ -17,12 +17,14 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
-from imgTest.views import uploadImg, showImg
+from imgTest.views import uploadImg, showImg, searchImg, mineBlock
 from django.conf.urls.static import static
 from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('uploadImg/', uploadImg),
-    path('showImg/', showImg)
+    path('showImg/', showImg),
+    path('searchImg/', searchImg),
+    path('mineBlock/', mineBlock),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,13 +1,68 @@
 <!DOCTYPE html>
+<!--
+__   __  _______  _______  _     _  _______  ______    ___   _
+|  | |  ||       ||       || | _ | ||       ||    _ |  |   | | |
+|  |_|  ||    ___||    ___|| || || ||   _   ||   | ||  |   |_| |
+|       ||   |___ |   |___ |       ||  | |  ||   |_||_ |      _|
+|_     _||    ___||    ___||       ||  |_|  ||    __  ||     |_
+ |   |  |   |___ |   |___ |   _   ||       ||   |  | ||    _  |
+ |___|  |_______||_______||__| |__||_______||___|  |_||___| |_|
+                      _______  _     _
+                     |       || | _ | |
+                     |  _____|| || || |
+                     | |_____ |       |
+                     |_____  ||       |
+                      _____| ||   _   |
+                     |_______||__| |__|
+-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Search image</title>
 </head>
+
+<style>
+body {
+	background:#555;
+}
+#search {
+}
+#search input[type="text"] {
+    border: 0 none;
+    font: bold 12px Arial,Helvetica,Sans-serif;
+    color: #d7d7d7;
+    width: 150px;
+    padding: 6px 15px 6px 35px;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    border-radius: 20px;
+    -webkit-transition: all 0.7s ease 0s;
+    -moz-transition: all 0.7s ease 0s;
+    -o-transition: all 0.7s ease 0s;
+    transition: all 0.7s ease 0s;
+    }
+#search input[type="text"]:focus {
+    color: #6a6f75;
+    width: 200px;
+    -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 0 rgba(0, 0, 0, 0.9) inset;
+    -moz-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 0 rgba(0, 0, 0, 0.9) inset;
+    }
+
+.centered {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  /* bring your own prefixes */
+  transform: translate(-50%, -50%);
+}
+</style>
 <body>
-    <form action="/showImg" method="get" target="_blank">
-  Search name: <input type="text" name="queryName" ><br>
-  <button type="submit">Submit</button>
-</form>
+  <div align="center" class="centered">
+    <form action="/showImg" method="get" target="_blank" id="search">
+      <!--Search name<br>-->
+      <input type="text" name="queryName" placeholder="Search name..."><br>
+      <!--<button type="submit">Submit</button>-->
+    </form>
+  </div>
 </body>
 </html>

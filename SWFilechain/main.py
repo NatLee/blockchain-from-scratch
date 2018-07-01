@@ -269,8 +269,8 @@ class Server(object):
             temp.write(data)
         with open(filename, 'rb') as fobj:
             private_key = RSA.import_key(open('server_private_rsa_key.bin').read(), passphrase=code)
-            enc_session_key, nonce, tag, ciphertext = [ fobj.read(x) 
-                                                        for x in (private_key.size_in_bytes(), 
+            enc_session_key, nonce, tag, ciphertext = [ fobj.read(x)
+                                                        for x in (private_key.size_in_bytes(),
                                                         16, 16, -1) ]
             cipher_rsa = PKCS1_OAEP.new(private_key)
             session_key = cipher_rsa.decrypt(enc_session_key)

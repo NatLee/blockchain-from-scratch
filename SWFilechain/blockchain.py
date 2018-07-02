@@ -103,11 +103,30 @@ class Blockchain(object):
 
     def query_block_by_name(self, name):
         query_result ={}
+        check_inserted = set()
         for block in reversed(self._blockchain):
             if isinstance(block.data, list):
-                for blockDataList in block.data:
+                for blockDataList in reversed(block.data):
                     if blockDataList[0] == name:
-                        if blockDataList[3] not in query_result:
-                            query_result[blockDataList[3]] = {'b64file' : blockDataList[1], 'public_key':[]}
-                        query_result[blockDataList[3]]['public_key'].append(blockDataList[2])
+                        #the same cerLevel have been insert into query_result
+                        #blockDataList[4] is cerLevel
+                        #print("#############")
+                        #print(blockDataList[4] in ['Low','Medium','High'])
+                        if blockDataList[4] in ['Low','Medium','High']:
+                            #the cerLevel data have been insert into query_result
+                            if blockDataList[4] in check_inserted:
+                                #if blockDataList[3](filehash)  have been insert into query_result then the public key need to be insert into result list
+                                if blockDataList[3] in query_result:
+                                    query_result[blockDataList[3]]['public_key'].append(blockDataList[2])
+                            else:
+                                #add the data into query_result
+                                query_result[blockDataList[3]] = {'b64file' : blockDataList[1], 'public_key':[]}
+                                query_result[blockDataList[3]]['public_key'].append(blockDataList[2])
+                            check_inserted.add(blockDataList[4])
+                        else:
+                            #blockDataList[4] is None
+                            #blockDataList[3](filehash)
+                            if blockDataList[3] not in query_result:
+                                query_result[blockDataList[3]] = {'b64file' : blockDataList[1], 'public_key':[]}
+                            query_result[blockDataList[3]]['public_key'].append(blockDataList[2])         
         return query_result

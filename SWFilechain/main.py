@@ -62,7 +62,6 @@ class Server(object):
             for query_hash in query_result:
                 query_file_bytes = bytes(query_result[query_hash]['b64file'], encoding = 'utf8')
                 data = b64decode(query_file_bytes)
-                print(self.descrypt_server(data))
                 returnResult[b64encode(self.descrypt_server(data)).decode('utf8')] = dict(Counter(query_result[query_hash]['public_key']))
         for ff in returnResult:
             pk_to_loc_dict = {}
@@ -84,14 +83,14 @@ class Server(object):
         return json(self.pool)
 
     async def add_data(self, request):
-        logger.info('78:Received message: {}'.format(request.json))
+        logger.info('87:Received message: {}'.format(request.json))
         loadJSON = request.json
         #print(loadJSON['public_key'])
         signature = bytes(loadJSON['signature'], encoding = 'utf8')
         base64Data = bytes(loadJSON['base64Data'], encoding = 'utf8')
         public_key = bytes(loadJSON['public_key'], encoding = 'utf8')
         if self.verify_rsa_sha1_signature(base64Data, public_key, signature):
-            data_list = [loadJSON["certificateOwner"],loadJSON['base64Data'],loadJSON['public_key'],loadJSON['fileHash']]
+            data_list = [loadJSON["certificateOwner"],loadJSON['base64Data'],loadJSON['public_key'],loadJSON['fileHash'],loadJSON["cerLevel"]]
             self.pool.append(data_list)
             await self.broadcast(self.response_broadcast_msg(data_list))
         return json(self.pool)
@@ -263,7 +262,7 @@ class Server(object):
     #server side
     def descrypt_server(self, data):
         filename = ''.join(random.choices(string.ascii_uppercase + string.digits, k = 10))
-        print("create file:" + filename)
+        #print("create file:" + filename)
         code = 'REMOVED-PASSPHRASE'
         with open(filename, 'wb') as temp:
             temp.write(data)

@@ -24,7 +24,7 @@ ip  =  "localhost"
 port = 3001
 end_point = "http://" + ip + ":" +str(port)
 location = 'AMERICA'
-private_key_path = "3001/client_private_rsa_key.bin"
+private_key_path = str(port)+"/client_private_rsa_key.bin"
 
 def gz(filename):
     f_in = open(filename, 'rb')  
@@ -131,16 +131,20 @@ def uploadImg(request):
     if request.method == 'POST':
         img = request.FILES.get('img')
         #print(img.read())
-        with open(img.name, 'wb+') as destination:
+        cerLevel = request.POST.get('cerLevel','')
+        filename =  ''.join(random.choices(string.ascii_uppercase + string.digits, k = 10))
+        #filename += '.jpeg'
+        with open(filename, 'wb+') as destination:
             for chunk in img.chunks():
                 destination.write(chunk)
-        original_data , send_to_server_data = clientSide(img.name)
-        send_to_server_data['certificateOwner'] = request.POST.get('cerOwner',img.name)
+        original_data , send_to_server_data = clientSide(filename)
+        send_to_server_data['certificateOwner'] = request.POST.get('cerOwner',filename)
         send_to_server_data['fileHash'] = calculate_hash(original_data)
+        send_to_server_data['cerLevel'] = cerLevel
         #print(send_to_server_data)
         print(send_to_server(send_to_server_data))
         #print(request.FILES.get('img'))
-        os.remove(img.name)
+        os.remove(filename)
         """
         img = IMG(img_url=request.FILES.get('img'))
         img.save()

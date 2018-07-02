@@ -21,7 +21,9 @@ __   __  _______  _______  _     _  _______  ______    ___   _
     <title>Image upload</title>
 </head>
 <script class="jsbin" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+
 <style type="text/css">
+
 body {
   font-family: sans-serif;
   background-color: #eeeeee;
@@ -180,18 +182,21 @@ input[type=submit] {
 input[type=submit]:hover {
     background-color: #45a049;
 }
-div {
-    border-radius: 5px;
-    background-color: #f2f2f2;
-    padding: 20px;
+.cerLevelSelector{
+  width: 100%;
+  padding: 5px 35px 5px 5px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  height: 34px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 </style>
-<!-- JavaScript -->
-<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.11.1/build/alertify.min.js"></script>
 
-<!-- CSS -->
-<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.1/build/css/alertify.min.css"/>
-<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.1/build/css/themes/default.min.css"/>
+{% load staticfiles %}
+<script src="{% static 'sweetalert2/sweetalert2.js' %}"></script>
+
 <body>
   <div class="file-upload">
     <form action="" method="post" enctype="multipart/form-data">
@@ -214,22 +219,26 @@ div {
           <input type="text" style="" name="cerOwner"></br>
           <h3>Certification Level<br></h3>
           <!--<input type="text" style="" name="cerLevel"></br>-->
-          <select name="cerLevel">
+          <select class="cerLevelSelector" name="cerLevel">
           <option value="None">NONE</option>
 　         <option value="Low">LOW</option>
 　         <option value="Medium">MEDIUM</option>
 　         <option value="High">HIGH</option>
 　         </select>
-          <input class="button" type="submit" value="upload">
+          <input class="button" type="submit" value="Upload">
         </div>
     </form>
 </div>
     <br>
     <div align="center">
+      <button type="button" class="button" onclick="onclickblockbutton()">Mine Block</button>
+      <br>
+      <!--
       <form action="/mineBlock/" method="post" target="_blank">
         {% csrf_token %}
         <button class="button" type="submit">Mine Block</button>
       </form>
+      -->
       <button class="button" onclick="location.href='/searchImg/'"><span>Search </span></button>
     </div>
 
@@ -272,11 +281,30 @@ $('.image-upload-wrap').bind('dragover', function () {
 });
 
 function onclickblockbutton() {
-alertify.confirm('Confirm Title', 'Confirm Message', function(){ alertify.success('Ok') }
-                , function(){ alertify.error('Cancel')});
-Run
+sendMineblock();
+swal(
+  'Good job!',
+  'You clicked the button!',
+  'success'
+);
 
-  }
+  };
+function sendMineblock() {
+  var payload = JSON.stringify({
+    test_id : "1"
+  });
+  $.ajax({
+    url: "/mineBlock/",
+    method: "POST",
+    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+    data: payload,
+    dataType: "json"
+  }).done(function(response) {
+    console.log(response.id + " " + response.name);
+  }).fail(function (error) {
+      console.log(error);
+  });
+}
 
 </script>
 </html>

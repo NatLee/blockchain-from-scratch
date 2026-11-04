@@ -1,0 +1,19 @@
+name: Build the WebAssembly core
+description: Compile src/wasm to WebAssembly and generate the JavaScript bindings into src/web/src/wasm-pkg.
+runs:
+  using: composite
+  steps:
+    - uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: wasm32-unknown-unknown
+    - uses: Swatinem/rust-cache@v2
+      with:
+        key: wasm
+    - name: Install wasm-bindgen-cli (same version as Cargo.lock)
+      shell: bash
+      run: |
+        sh src/web/scripts/install-wasm-bindgen.sh "$HOME/.local/bin"
+        echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+    - name: Build
+      shell: bash
+      run: sh src/web/scripts/build-wasm.sh

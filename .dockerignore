@@ -1,0 +1,10 @@
+.git
+.github
+target
+**/node_modules
+src/web/dist
+src/web/src/wasm-pkg
+data
+**/*.hex
+.env
+.env.*

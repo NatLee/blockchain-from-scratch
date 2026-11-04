@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["src/core", "src/node"]
+members = ["src/core", "src/node", "src/wasm"]
 default-members = ["src/core", "src/node"]
 
 [workspace.package]

@@ -1,0 +1,130 @@
+<!doctype html>
+<!--
+  README 封面。用 Chromium 系的瀏覽器輸出淺色和深色兩張（網址加 #dark 是深色），例如：
+    msedge --headless=new --hide-scrollbars --force-device-scale-factor=2 --window-size=960,400
+           --default-background-color=00000000 --virtual-time-budget=5000
+           --screenshot=hero-dark.png "file:///…/hero.html#dark"
+  區塊的 hash、nonce 是 docker compose 起的節點實際挖出來的（難度 16）。
+-->
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<title>blockchain-from-scratch banner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=block" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff; --bg2: #f6f8fa; --ink: #1f2328; --muted: #59636e; --line: #d1d9e0; --card: #ffffff;
+    --accent: #4f46e5; --green: #1a7f37; --zero: #1a7f37; --chip: #eef2ff; --chipink: #3730a3;
+    --shadow: 0 1px 2px rgba(31,35,40,.06), 0 6px 18px rgba(31,35,40,.07);
+    --tint1: rgba(79,70,229,.10); --tint2: rgba(26,127,55,.07);
+  }
+  .dark {
+    --bg: #0d1117; --bg2: #151b23; --ink: #f0f6fc; --muted: #9198a1; --line: #3d444d; --card: #151b23;
+    --accent: #818cf8; --green: #3fb950; --zero: #3fb950; --chip: #1e1b4b; --chipink: #c7d2fe;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    --tint1: rgba(129,140,248,.16); --tint2: rgba(63,185,80,.10);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: transparent; }
+  body { width: 960px; height: 400px; font-family: Inter, "Noto Sans TC", "Segoe UI", sans-serif; color: var(--ink); }
+  .frame { position: relative; width: 960px; height: 400px; border-radius: 22px; overflow: hidden;
+           border: 1px solid var(--line);
+           background: radial-gradient(520px 300px at 92% 6%, var(--tint1), transparent 70%),
+                       radial-gradient(420px 260px at 2% 100%, var(--tint2), transparent 70%), var(--bg); }
+  .dots { position: absolute; inset: 0; opacity: .5;
+          background-image: radial-gradient(var(--line) 1px, transparent 1.2px); background-size: 22px 22px;
+          -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 60%, #000 100%); }
+  .mono { font-family: "JetBrains Mono", Consolas, monospace; }
+
+  header { position: absolute; left: 44px; top: 40px; display: flex; align-items: center; gap: 18px; }
+  .mark { width: 60px; height: 60px; border-radius: 16px; background: linear-gradient(140deg, #4f46e5, #7c3aed 55%, #16a34a);
+          display: grid; place-items: center; box-shadow: var(--shadow); }
+  h1 { margin: 0; font-size: 40px; font-weight: 800; letter-spacing: -0.035em; line-height: 1; }
+  .tag { margin: 10px 0 0; font-size: 19px; color: var(--muted); font-weight: 500; }
+  .tag b { color: var(--ink); font-weight: 700; }
+
+  .chain { position: absolute; left: 44px; top: 150px; display: flex; align-items: center; gap: 8px; }
+  .block { width: 172px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow);
+           padding: 12px 14px; }
+  .block .title { display: flex; justify-content: space-between; align-items: baseline; font-weight: 700; font-size: 14px; }
+  .block .title span { font-size: 11px; color: var(--muted); font-weight: 600; }
+  .row { margin-top: 6px; font-size: 11.5px; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
+  .row b { color: var(--ink); font-weight: 500; }
+  .zero { color: var(--zero); font-weight: 700; }
+  .link { color: var(--accent); font-size: 22px; font-weight: 700; }
+
+  .cmds { position: absolute; right: 40px; top: 150px; width: 268px; display: grid; gap: 10px; }
+  .cmd { background: #0f172a; color: #e2e8f0; border-radius: 12px; padding: 11px 14px; font-size: 12px; white-space: nowrap; box-shadow: var(--shadow); }
+  .cmd .hint { display: block; color: #94a3b8; font-family: Inter, "Noto Sans TC", sans-serif; font-size: 11px; margin-bottom: 4px; }
+  .cmd .p { color: #818cf8; }
+
+  .route { position: absolute; left: 44px; right: 40px; bottom: 34px; display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; background: var(--chip); color: var(--chipink); border-radius: 999px;
+          padding: 6px 11px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+  .chip i { font-style: normal; font-family: "JetBrains Mono", monospace; font-size: 11px; opacity: .75; }
+  .chip.last { background: var(--accent); color: #fff; }
+  .arrow { color: var(--muted); font-size: 13px; }
+  .route-label { position: absolute; left: 44px; bottom: 76px; font-size: 11px; font-weight: 700; letter-spacing: .12em; color: var(--muted); }
+</style>
+</head>
+<body>
+<script>if (location.hash === '#dark') document.documentElement.className = 'dark';</script>
+<div class="frame">
+  <div class="dots"></div>
+  <header>
+    <div class="mark">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round">
+        <rect x="3" y="12" width="9" height="12" rx="2"/><rect x="14" y="12" width="9" height="12" rx="2"/><rect x="25" y="12" width="8" height="12" rx="2"/>
+        <path d="M12 18h2M23 18h2"/>
+      </svg>
+    </div>
+    <div>
+      <h1>blockchain-from-scratch</h1>
+      <p class="tag">從零開始，用 <b>Rust</b> 寫一條區塊鏈 · 每章都能跑、有測試，網頁上直接玩</p>
+    </div>
+  </header>
+
+  <div class="chain">
+    <div class="block">
+      <div class="title">區塊 #1 <span>難度 16</span></div>
+      <div class="row">prev <b class="mono">a5fb2609…</b></div>
+      <div class="row">nonce <b class="mono">125712</b></div>
+      <div class="row">hash <b class="mono"><span class="zero">0000</span>8ae5…</b></div>
+    </div>
+    <div class="link">→</div>
+    <div class="block">
+      <div class="title">區塊 #2 <span>難度 16</span></div>
+      <div class="row">prev <b class="mono"><span class="zero">0000</span>8ae5…</b></div>
+      <div class="row">nonce <b class="mono">138274</b></div>
+      <div class="row">hash <b class="mono"><span class="zero">0000</span>9eac…</b></div>
+    </div>
+    <div class="link">→</div>
+    <div class="block">
+      <div class="title">區塊 #3 <span>難度 16</span></div>
+      <div class="row">prev <b class="mono"><span class="zero">0000</span>9eac…</b></div>
+      <div class="row">nonce <b class="mono">43629</b></div>
+      <div class="row">hash <b class="mono"><span class="zero">0000</span>a5ea…</b></div>
+    </div>
+  </div>
+
+  <div class="cmds">
+    <div class="cmd mono"><span class="hint">跑第 1 章的範例</span><span class="p">$</span> cargo run --example ch01-hash</div>
+    <div class="cmd mono"><span class="hint">起 3 個節點的網路</span><span class="p">$</span> docker compose up --build</div>
+  </div>
+
+  <div class="route-label">學習路線</div>
+  <div class="route">
+    <span class="chip"><i>1</i>雜湊</span><span class="arrow">›</span>
+    <span class="chip"><i>2</i>區塊</span><span class="arrow">›</span>
+    <span class="chip"><i>3</i>鏈</span><span class="arrow">›</span>
+    <span class="chip"><i>4</i>挖礦</span><span class="arrow">›</span>
+    <span class="chip"><i>5</i>簽章</span><span class="arrow">›</span>
+    <span class="chip"><i>6</i>mempool</span><span class="arrow">›</span>
+    <span class="chip"><i>7</i>P2P</span><span class="arrow">›</span>
+    <span class="chip"><i>8</i>共識</span><span class="arrow">›</span>
+    <span class="chip last"><i>9</i>FileChain</span>
+  </div>
+</div>
+</body>
+</html>

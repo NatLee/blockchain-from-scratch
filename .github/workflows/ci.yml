@@ -1,0 +1,113 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rust:
+    name: Rust (core + node)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: Format
+        run: cargo fmt --all --check
+      - name: Lint
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+      - name: Test (every chapter, exercises, 3-node network)
+        run: cargo test --workspace --locked
+      - name: Run every chapter example
+        run: |
+          for file in src/core/examples/*.rs; do
+            example=$(basename "$file" .rs)
+            echo "::group::cargo run --example $example"
+            cargo run --locked --release --example "$example"
+            echo "::endgroup::"
+          done
+
+  web:
+    name: Web (WebAssembly + React)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/web
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/build-wasm
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: src/web/package-lock.json
+      - name: Install
+        run: npm ci
+      - name: Test
+        run: npm test
+      - name: Type-check and build
+        run: npm run build
+      - uses: actions/upload-artifact@v7
+        with:
+          name: wasm-pkg
+          path: src/web/src/wasm-pkg
+          retention-days: 1
+
+  compose:
+    name: 3-node network (docker compose)
+    needs: web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Start 3 nodes and the web page
+        run: docker compose up --build --detach --wait
+      - name: Every original API answers
+        run: |
+          set -x
+          curl -fsS http://localhost:3001/blocks
+          curl -fsS http://localhost:3002/poolList
+          curl -fsS http://localhost:3003/getPublicKey
+          curl -fsS "http://localhost:3001/queryBlockByName?queryName=nobody"
+          curl -fsS -X POST http://localhost:3001/mineBlock | grep -q "No data can be packed into block"
+          curl -fsS -X POST -H 'content-type: application/json' -d '{"peer":"ws://node3:3003"}' http://localhost:3002/addPeer
+          for i in $(seq 1 30); do
+            [ "$(curl -fsS http://localhost:3001/peers | grep -o ':' | wc -l)" -ge 2 ] && break
+            sleep 1
+          done
+          curl -fsS http://localhost:3001/peers
+          # 3 個節點共用同一把鏈金鑰
+          [ "$(curl -fsS http://localhost:3001/getPublicKey)" = "$(curl -fsS http://localhost:3003/getPublicKey)" ]
+          curl -fsS http://localhost:8080/ | grep -q '<div id="root">'
+      - uses: actions/download-artifact@v8
+        with:
+          name: wasm-pkg
+          path: src/web/src/wasm-pkg
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: src/web/package-lock.json
+      - name: Web client end-to-end (upload on node 1, mine on node 2, query node 3)
+        working-directory: src/web
+        env:
+          NODE_URLS: http://localhost:3001,http://localhost:3002,http://localhost:3003
+        run: |
+          npm ci
+          npm run test:e2e
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Command-line client (the old notebook flow)
+        run: cargo run --locked -p chain-node --example ch09-client -- http://localhost:3001 docs/images/samples Low AMERICA
+      - name: Node logs
+        if: always()
+        run: docker compose logs --no-color
+      - name: Stop
+        if: always()
+        run: docker compose down --volumes

@@ -1,0 +1,52 @@
+name: Deploy web to GitHub Pages
+
+# Publishes the interactive web page (src/web) to GitHub Pages on every push to master.
+# The build uses relative asset paths (base: "./"), so it works under /blockchain-from-scratch/.
+# One-time setup after the repo is public: Settings → Pages → Build and deployment → Source: GitHub Actions.
+# While the repo is private the deploy is skipped, so this workflow stays green.
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    name: Build
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/build-wasm
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: src/web/package-lock.json
+      - name: Install, test and build
+        working-directory: src/web
+        run: |
+          npm ci
+          npm test
+          npm run build
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: src/web/dist
+
+  deploy:
+    name: Deploy
+    needs: build
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

@@ -1,0 +1,67 @@
+# 一鍵起 3 個節點的區塊鏈網路，加上互動網頁：
+#
+#   docker compose up --build
+#
+# 節點：http://localhost:3001、3002、3003（HTTP API 和 websocket 共用同一個 port）
+# 網頁：http://localhost:8080（FileChain 頁面切到「真的節點」就會連到節點 1）
+# port 被占用時，可以用環境變數換掉，例如 NODE1_PORT=13001 WEB_PORT=18080 docker compose up --build
+
+x-node: &node
+  build:
+    context: .
+    dockerfile: src/node/Dockerfile
+  image: blockchain-from-scratch-node
+  volumes:
+    # FileChain 的鏈金鑰：第一個節點啟動時產生，3 個節點共用（跟原本的專案一樣，所有節點用同一組金鑰）。
+    - chain-key:/keys
+  healthcheck:
+    # 確認 port 已經開好（映像檔裡沒有 curl，用 bash 的 /dev/tcp 連一下）。
+    test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/$${PORT}"]
+    interval: 2s
+    timeout: 2s
+    retries: 30
+
+services:
+  node1:
+    <<: *node
+    environment:
+      PORT: "3001"
+    ports:
+      - "${NODE1_PORT:-3001}:3001"
+
+  node2:
+    <<: *node
+    environment:
+      PORT: "3002"
+      PEERS: ws://node1:3001
+    ports:
+      - "${NODE2_PORT:-3002}:3002"
+    depends_on:
+      node1:
+        condition: service_healthy
+
+  node3:
+    <<: *node
+    environment:
+      PORT: "3003"
+      PEERS: ws://node1:3001,ws://node2:3002
+    ports:
+      - "${NODE3_PORT:-3003}:3003"
+    depends_on:
+      node1:
+        condition: service_healthy
+      node2:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: src/web/Dockerfile
+      args:
+        VITE_NODE_URL: http://localhost:${NODE1_PORT:-3001}
+    image: blockchain-from-scratch-web
+    ports:
+      - "${WEB_PORT:-8080}:80"
+
+volumes:
+  chain-key:

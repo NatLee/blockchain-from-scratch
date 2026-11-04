@@ -1,0 +1,21 @@
+[workspace]
+resolver = "3"
+members = ["src/core", "src/node", "src/wasm"]
+default-members = ["src/core", "src/node"]
+
+[workspace.package]
+edition = "2024"
+# 相依套件裡要求最高的是 aes 0.9（Rust 1.89）。
+rust-version = "1.89"
+license = "MIT"
+publish = false
+
+# 挖礦要算很多次 SHA-256。開發版（debug）也把雜湊相關的 crate 最佳化，測試和範例才不會慢到像當機。
+[profile.dev.package.sha2]
+opt-level = 3
+[profile.dev.package.blockchain-from-scratch]
+opt-level = 1
+
+[profile.release]
+lto = "thin"
+strip = true
